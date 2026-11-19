@@ -1,10 +1,600 @@
-<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise</title>
 
 <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+body { background: #fff; }
+
+/* LOGO */
+
+.logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 112px;
+    height: 112px;
+    transform: translate(-50%, -50%);
+    animation: logoDrop 1.4s cubic-bezier(.2,.8,.3,1.3) forwards;
+    z-index: 10;
+}
+
+.logo svg {
+    width: 100%;
+    height: 100%;
+}
+
+.wave {
+    fill: none;
+    stroke: #000;
+    stroke-width: 5;
+    stroke-linecap: round;
+    animation: waveLight 2.4s ease-in-out infinite;
+}
+
+.wave2 { animation-delay: .25s; }
+.wave3 { animation-delay: .5s; }
+
+@keyframes logoDrop {
+    0% {
+        top: -150px;
+        transform: translate(-50%, -50%) rotate(-15deg);
+    }
+    75% {
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(5deg);
+    }
+    100% {
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(0);
+    }
+}
+
+@keyframes waveLight {
+    0%, 100% { stroke: #000; }
+    50% { stroke: #fff; }
+}
+
+/* BUTTON */
+
+.surprise-btn {
+    position: absolute;
+    top: calc(50% + 90px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 13px 25px;
+    border: none;
+    border-radius: 30px;
+    background: #111;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.3px;
+    white-space: nowrap;
+    cursor: pointer;
+    z-index: 11;
+    animation: buttonAppear .6s ease 1.4s both;
+}
+
+@keyframes buttonAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 15px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* TRANSITION */
+
+.wipe-circle {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.wipe-circle.active {
+    animation: wipe 1.5s ease-in-out forwards;
+}
+
+@keyframes wipe {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    65% {
+        transform: translate(-50%, -50%) scale(45);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(45);
+        opacity: 0;
+    }
+}
+
+/* LIGHT BACKGROUND */
+
+.scene {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2;
+    background: linear-gradient(
+        135deg,
+        #fff9f2,
+        #f3fff7,
+        #f5f3ff,
+        #fff3f7,
+        #f1faff
+    );
+    background-size: 300% 300%;
+}
+
+.scene.show {
+    visibility: visible;
+    animation: sceneAppear .8s ease forwards,
+               backgroundFlow 16s ease-in-out 1s infinite;
+}
+
+@keyframes sceneAppear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes backgroundFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* SOFT LIGHT BLOBS */
+
+.glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(45px);
+    opacity: .55;
+    pointer-events: none;
+}
+
+.glow1 {
+    width: 190px;
+    height: 190px;
+    background: #ffd9c7;
+    top: 4%;
+    left: -55px;
+    animation: glowFloat 9s ease-in-out infinite alternate;
+}
+
+.glow2 {
+    width: 210px;
+    height: 210px;
+    background: #d5f5e2;
+    right: -65px;
+    top: 25%;
+    animation: glowFloat 11s ease-in-out infinite alternate-reverse;
+}
+
+.glow3 {
+    width: 190px;
+    height: 190px;
+    background: #e2d9ff;
+    left: -50px;
+    bottom: 5%;
+    animation: glowFloat 10s ease-in-out infinite alternate;
+}
+
+.glow4 {
+    width: 180px;
+    height: 180px;
+    background: #ffe0ec;
+    right: -45px;
+    bottom: 2%;
+    animation: glowFloat 12s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes glowFloat {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(20px, -25px) scale(1.15); }
+}
+
+/* PARTICLES */
+
+.particles span {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    box-shadow: 0 0 12px rgba(255,255,255,.8);
+    animation: particleFloat 8s ease-in-out infinite alternate;
+}
+
+.particles span:nth-child(1) { left: 12%; top: 20%; }
+.particles span:nth-child(2) { left: 82%; top: 15%; animation-delay: 1s; }
+.particles span:nth-child(3) { left: 20%; top: 75%; animation-delay: 2s; }
+.particles span:nth-child(4) { left: 75%; top: 80%; animation-delay: 3s; }
+.particles span:nth-child(5) { left: 50%; top: 12%; animation-delay: 1.5s; }
+.particles span:nth-child(6) { left: 88%; top: 55%; animation-delay: 2.5s; }
+
+@keyframes particleFloat {
+    from { transform: translateY(0); opacity: .3; }
+    to { transform: translateY(-25px); opacity: .9; }
+}
+
+/* CONNECTING LINE - 2PX */
+
+.connection {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.connection-path {
+    fill: none;
+    stroke: rgba(255,255,255,.95);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 4px rgba(150,160,180,.8));
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+}
+
+.connection-path.animate {
+    animation: drawLine 7.5s ease-in-out forwards;
+}
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+/* MOVING LIGHT DOT */
+
+.line-dot {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 10px 4px rgba(255,255,255,.8);
+    z-index: 4;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.line-dot.animate {
+    animation: dotTravel 7.5s linear forwards;
+}
+
+@keyframes dotTravel {
+    0% {
+        opacity: 0;
+        left: 12%;
+        top: 18%;
+    }
+    5% { opacity: 1; }
+    20% { left: 88%; top: 18%; }
+    25% { left: 88%; top: 18%; }
+    40% { left: 12%; top: 43%; }
+    45% { left: 12%; top: 43%; }
+    60% { left: 88%; top: 43%; }
+    65% { left: 88%; top: 43%; }
+    80% { left: 50%; top: 80%; }
+    100% {
+        left: 50%;
+        top: 80%;
+        opacity: 0;
+    }
+}
+
+/* BIGGER MUSIC CARDS */
+
+.photo-card {
+    position: absolute;
+
+    width: 40vw;
+    max-width: 185px;
+    min-width: 140px;
+
+    padding: 8px;
+    background: #171717;
+    border-radius: 18px;
+    box-shadow: 0 14px 32px rgba(0,0,0,.22);
+    overflow: hidden;
+    z-index: 3;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(.65);
+}
+
+/* PHOTO COVER */
+
+.cover {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #333;
+}
+
+.cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* MUSIC DETAILS */
+
+.music-info {
+    padding: 10px 4px 4px;
+    color: #fff;
+}
+
+.music-title {
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.music-subtitle {
+    font-size: 10px;
+    color: #aaa;
+}
+
+/* PROGRESS BAR */
+
+.progress-area {
+    width: 100%;
+    height: 3px;
+    background: #555;
+    border-radius: 10px;
+    margin: 10px 0 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 35%;
+    height: 100%;
+    background: #fff;
+    border-radius: 10px;
+}
+
+/* MUSIC CONTROLS */
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 19px;
+    height: 30px;
+    color: white;
+}
+
+.control {
+    font-size: 15px;
+    color: #ddd;
+    line-height: 1;
+}
+
+.play-control {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    padding-left: 2px;
+}
+
+/* CARD REVEAL */
+
+.photo-card.visible {
+    visibility: visible;
+    animation:
+        cardReveal .8s cubic-bezier(.2,.8,.2,1) forwards,
+        photoFloat 5s ease-in-out .8s infinite alternate;
+}
+
+@keyframes cardReveal {
+    0% {
+        opacity: 0;
+        scale: .65;
+    }
+    70% {
+        opacity: 1;
+        scale: 1.08;
+    }
+    100% {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+@keyframes photoFloat {
+    from { margin-top: 0; }
+    to { margin-top: -9px; }
+}
+
+/* FIVE CARD POSITIONS */
+
+.card1 {
+    top: 4%;
+    left: 3%;
+    rotate: -7deg;
+}
+
+.card2 {
+    top: 4%;
+    right: 3%;
+    rotate: 7deg;
+}
+
+.card3 {
+    top: 37%;
+    left: 1%;
+    rotate: -6deg;
+}
+
+.card4 {
+    top: 37%;
+    right: 1%;
+    rotate: 7deg;
+}
+
+.card5 {
+    bottom: 2%;
+    left: 50%;
+    translate: -50% 0;
+    rotate: -3deg;
+}
+
+/* SEARCH BAR */
+
+.search-box {
+    position: fixed;
+    z-index: 8;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 84%;
+    max-width: 520px;
+    height: 62px;
+    padding: 0 17px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #202020;
+    border: 1px solid #555;
+    border-radius: 17px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.24);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.search-box.show {
+    visibility: visible;
+    animation: searchAppear .8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+@keyframes searchAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.65);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.search-icon {
+    color: #eee;
+    font-size: 25px;
+    line-height: 1;
+}
+
+.typing-text {
+    flex: 1;
+    min-width: 0;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 15px;
+    background: #fff;
+    margin-left: 3px;
+    vertical-align: middle;
+    animation: blink .7s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* SMALL PHONES */
+
+@media (max-width: 380px) {
+    .photo-card {
+        width: 39vw;
+        min-width: 130px;
+        padding: 7px;
+    }
+
+    .music-title { font-size: 12px; }
+    .music-subtitle { font-size: 9px; }
+    .music-controls { gap: 15px; }
+
+    .search-box {
+        width: 88%;
+        height: 58px;
+        padding: 0 13px;
+    }
+
+    .typing-text { font-size: 11px; }
+}
+
 /* long wish lines wrap inside the search bar */
-.search-box { height: auto; min-height: 62px; padding-top: 12px; padding-bottom: 12px; }
-.typing-text { white-space: normal; word-break: break-word; line-height: 1.35; }
+.search-box {
+    height: auto;
+    min-height: 62px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.typing-text {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.35;
+}
 </style>
+</head>
+<body>
 
 <!-- HIDDEN YOUTUBE MUSIC PLAYER -->
 <div style="position:fixed; left:-10px; top:-10px; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden;">
