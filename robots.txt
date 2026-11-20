@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rhk4133-dev.github.io/RHK-WISHES-2/sitemap.xml
