@@ -13,6 +13,11 @@ input,button{width:100%;padding:12px;margin-bottom:12px;border-radius:10px;borde
 button{background:#ff3d81;border:none;font-weight:bold}
 img{max-width:100%;border-radius:12px;margin-bottom:12px}
 .status{opacity:.8;margin-bottom:6px}
+.row{display:flex;align-items:center;gap:12px;background:#1a1a26;border:1px solid #333;border-radius:12px;padding:10px;margin-bottom:10px}
+.row img{width:64px;height:64px;object-fit:cover;margin:0;border-radius:8px}
+.row .t{flex:1;font-size:15px}
+.row .t small{display:block;opacity:.6;margin-top:3px}
+.row button{width:auto;margin:0;padding:10px 14px;background:#d62b4b;font-size:14px}
 </style>
 </head>
 <body>
@@ -27,6 +32,11 @@ img{max-width:100%;border-radius:12px;margin-bottom:12px}
 
 <hr>
 
+<h2>Delete Templates</h2>
+<div id="dlist"></div>
+
+<hr>
+
 <h2>Home Background</h2>
 <input id="bgfile" type="file" accept="image/*">
 <img id="bgpreview" style="display:none">
@@ -35,7 +45,7 @@ img{max-width:100%;border-radius:12px;margin-bottom:12px}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, deleteDoc, getDocs, collection, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
@@ -72,6 +82,34 @@ function preview(inputId, imgId){
 preview("file","preview");
 preview("bgfile","bgpreview");
 
+async function loadList(){
+  const box = $("dlist");
+  try{
+    const snap = await getDocs(query(collection(db,"templates"), orderBy("n","desc")));
+    if(snap.empty){ box.innerHTML = '<div class="status">No templates yet</div>'; return; }
+    box.innerHTML = snap.docs.map(d => {
+      const i = d.data();
+      return `<div class="row">
+        <img src="${i.image}">
+        <div class="t">${i.name}<small>birthday${i.n}.html</small></div>
+        <button data-id="${d.id}" data-n="${i.n}">Delete</button>
+      </div>`;
+    }).join("");
+    box.querySelectorAll("button").forEach(b => {
+      b.onclick = async () => {
+        if(!confirm("Delete birthday" + b.dataset.n + " card from Trending and Templates?")) return;
+        try{
+          await deleteDoc(doc(db,"templates",b.dataset.id));
+          loadList();
+        }catch(err){ alert("Error: " + err.message); }
+      };
+    });
+  }catch(err){
+    box.innerHTML = '<div class="status">Error: ' + err.message + '</div>';
+  }
+}
+loadList();
+
 $("save").onclick = async () => {
   const n = parseInt($("n").value);
   const name = $("name").value.trim();
@@ -83,6 +121,7 @@ $("save").onclick = async () => {
     $("status").textContent = "Saving...";
     await setDoc(doc(db,"templates","birthday"+n), { n, name, image, createdAt: serverTimestamp() });
     $("status").textContent = "Saved! birthday" + n + ".html added to home.";
+    loadList();
   }catch(err){
     $("status").textContent = "Error: " + err.message;
   }
