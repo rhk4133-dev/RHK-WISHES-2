@@ -11,18 +11,26 @@ body::before,body::after{content:"";position:fixed;width:260px;height:260px;bord
 body::before{background:#ff3d81;top:80px;left:-80px;opacity:.4}
 body::after{background:#5b3dff;top:360px;right:-90px;opacity:.4}
 .wrap{position:relative;z-index:1;padding:0 18px 40px}
-header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25)}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25);position:relative}
 .brand{font-size:22px;font-weight:bold;letter-spacing:1px}
-.menu{width:26px;cursor:pointer}
-.menu span{display:block;height:3px;background:#fff;border-radius:2px;margin:5px 0}
+.profile{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;font-weight:bold;font-size:17px}
+.profile img{width:100%;height:100%;object-fit:cover}
+.profile svg{width:22px;height:22px;fill:#fff}
+.pmenu{display:none;position:absolute;right:0;top:66px;width:230px;padding:16px;z-index:10;text-align:center;background:rgba(30,30,45,.85)}
+.pmenu.show{display:block}
+.pmenu .av{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:#ff3d81;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;overflow:hidden}
+.pmenu .av img{width:100%;height:100%;object-fit:cover}
+.pmenu .nm{font-weight:bold;font-size:16px;word-break:break-word}
+.pmenu .em{font-size:13px;opacity:.7;margin:4px 0 14px;word-break:break-all}
+.pmenu button{width:100%;padding:10px;border:none;border-radius:10px;background:#ff3d81;color:#fff;font-weight:bold;font-size:15px}
 h2{margin:22px 0 12px;font-size:20px}
 .glass{background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
 a{color:inherit;text-decoration:none}
-#trending{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;position:relative;scrollbar-width:none}
+#trending{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
 #trending::-webkit-scrollbar{display:none}
-#trending .glass{flex:0 0 78%;scroll-snap-align:start}
-#trending img{width:100%;height:180px;object-fit:cover;display:block}
-#trending .info{padding:12px 14px;font-size:17px;font-weight:bold}
+.slide{flex:0 0 100%;scroll-snap-align:start;display:block}
+.slide img{width:100%;height:200px;object-fit:cover;display:block}
+.slide .info{padding:14px 16px;font-size:18px;font-weight:bold}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .card img{width:100%;height:130px;object-fit:cover;display:block}
 .card .info{padding:10px 12px;font-size:15px}
@@ -33,11 +41,12 @@ a{color:inherit;text-decoration:none}
 <div class="wrap">
   <header>
     <div class="brand">RHK WISHES</div>
-    <div class="menu"><span></span><span></span><span></span></div>
+    <div class="profile" id="profileBtn"></div>
+    <div class="glass pmenu" id="pmenu"></div>
   </header>
 
   <h2>Trending</h2>
-  <div id="trending"><div class="msg">Loading...</div></div>
+  <div id="trending" class="glass"><div class="msg" style="padding:16px">Loading...</div></div>
 
   <h2>Birthday Templates</h2>
   <div id="list" class="grid"></div>
@@ -46,6 +55,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
@@ -58,8 +68,47 @@ const firebaseConfig = {
   measurementId: "G-RF4GEDGP9N"
 };
 
-const db = getFirestore(initializeApp(firebaseConfig));
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
+/* ---------- Profile ---------- */
+const btn = document.getElementById("profileBtn");
+const menu = document.getElementById("pmenu");
+const personSvg = '<svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg>';
+let currentUser = null;
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if(user){
+    const name = user.displayName || user.email.split("@")[0];
+    const initial = name.charAt(0).toUpperCase();
+    btn.innerHTML = user.photoURL ? `<img src="${user.photoURL}">` : initial;
+    menu.innerHTML = `
+      <div class="av">${user.photoURL ? `<img src="${user.photoURL}">` : initial}</div>
+      <div class="nm">${name}</div>
+      <div class="em">${user.email || ""}</div>
+      <button id="logout">Logout</button>`;
+    document.getElementById("logout").onclick = async () => {
+      await signOut(auth);
+      menu.classList.remove("show");
+    };
+  }else{
+    btn.innerHTML = personSvg;
+    menu.innerHTML = "";
+  }
+});
+
+btn.onclick = e => {
+  e.stopPropagation();
+  if(!currentUser){ location.href = "login.html"; return; }
+  menu.classList.toggle("show");
+};
+document.addEventListener("click", e => {
+  if(!menu.contains(e.target)) menu.classList.remove("show");
+});
+
+/* ---------- Background ---------- */
 async function loadBackground(){
   try{
     const s = await getDoc(doc(db,"settings","home"));
@@ -70,26 +119,32 @@ async function loadBackground(){
   }catch(e){}
 }
 
+/* ---------- Templates ---------- */
 async function loadTemplates(){
   const t = document.getElementById("trending");
   const l = document.getElementById("list");
   try{
     const snap = await getDocs(query(collection(db,"templates"), orderBy("n","desc")));
     const items = snap.docs.map(d => d.data());
-    if(!items.length){ t.innerHTML = '<div class="msg">No templates yet</div>'; return; }
+    if(!items.length){
+      t.innerHTML = '<div class="msg" style="padding:16px">No templates yet</div>';
+      return;
+    }
 
     const latest = items.slice(0,4);
     t.innerHTML = latest.map(i => `
-      <a class="glass" href="birthday${i.n}.html">
+      <a class="slide" href="birthday${i.n}.html">
         <img src="${i.image}"><div class="info">${i.name}</div>
       </a>`).join("");
 
     if(latest.length > 1){
       let idx = 0;
+      t.addEventListener("scroll", () => {
+        idx = Math.round(t.scrollLeft / t.clientWidth);
+      });
       setInterval(() => {
         idx = (idx + 1) % latest.length;
-        const first = t.children[0].offsetLeft;
-        t.scrollTo({left: t.children[idx].offsetLeft - first, behavior:"smooth"});
+        t.scrollTo({left: idx * t.clientWidth, behavior:"smooth"});
       }, 2000);
     }
 
@@ -98,7 +153,7 @@ async function loadTemplates(){
         <img src="${i.image}"><div class="info">${i.name}</div>
       </a>`).join("");
   }catch(e){
-    t.innerHTML = '<div class="msg">Could not load templates</div>';
+    t.innerHTML = '<div class="msg" style="padding:16px">Could not load templates</div>';
   }
 }
 
