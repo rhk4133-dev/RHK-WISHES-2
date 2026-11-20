@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RHK WISHES</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0b0b12;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
+body::before,body::after{content:"";position:fixed;width:260px;height:260px;border-radius:50%;filter:blur(90px);z-index:0}
+body::before{background:#ff3d81;top:80px;left:-80px;opacity:.5}
+body::after{background:#5b3dff;top:360px;right:-90px;opacity:.5}
+.wrap{position:relative;z-index:1;padding:0 18px 40px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25)}
+.brand{font-size:22px;font-weight:bold;letter-spacing:1px}
+.menu{width:26px;cursor:pointer}
+.menu span{display:block;height:3px;background:#fff;border-radius:2px;margin:5px 0}
+h2{margin:22px 0 12px;font-size:20px}
+.glass{background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
+a{color:inherit;text-decoration:none}
+.trend img{width:100%;height:190px;object-fit:cover;display:block}
+.trend .info{padding:14px 16px;font-size:18px;font-weight:bold}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card img{width:100%;height:130px;object-fit:cover;display:block}
+.card .info{padding:10px 12px;font-size:15px}
+.msg{opacity:.7;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">RHK WISHES</div>
+    <div class="menu"><span></span><span></span><span></span></div>
+  </header>
+
+  <h2>Trending</h2>
+  <div id="trending" class="msg">Loading...</div>
+
+  <h2>Birthday Templates</h2>
+  <div id="list" class="grid"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
+  authDomain: "rhk-music-24bbc.firebaseapp.com",
+  databaseURL: "https://rhk-music-24bbc-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "rhk-music-24bbc",
+  storageBucket: "rhk-music-24bbc.firebasestorage.app",
+  messagingSenderId: "571438674805",
+  appId: "1:571438674805:web:bcfe7856316b638d08193c",
+  measurementId: "G-RF4GEDGP9N"
+};
+
+const db = getFirestore(initializeApp(firebaseConfig));
+
+async function load(){
+  const t = document.getElementById("trending");
+  const l = document.getElementById("list");
+  try{
+    const snap = await getDocs(query(collection(db,"templates"), orderBy("n","desc")));
+    const items = snap.docs.map(d => d.data());
+    if(!items.length){ t.textContent = "No templates yet"; return; }
+
+    const top = items[0];
+    t.className = "glass trend";
+    t.innerHTML = `<a href="birthday${top.n}.html"><img src="${top.image}"><div class="info">${top.name}</div></a>`;
+
+    l.innerHTML = items.map(i => `
+      <a class="glass card" href="birthday${i.n}.html">
+        <img src="${i.image}"><div class="info">${i.name}</div>
+      </a>`).join("");
+  }catch(e){
+    t.textContent = "Could not load templates";
+  }
+}
+load();
+</script>
+</body>
+</html>
