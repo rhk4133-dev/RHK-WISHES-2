@@ -3,59 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RHK WISHES</title>
+<title>Login - RHK WISHES</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#0b0b12;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
-body::before,body::after{content:"";position:fixed;width:260px;height:260px;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none}
-body::before{background:#ff3d81;top:80px;left:-80px;opacity:.4}
-body::after{background:#5b3dff;top:360px;right:-90px;opacity:.4}
-.wrap{position:relative;z-index:1;padding:0 18px 40px}
-header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25);position:relative}
-.brand{font-size:22px;font-weight:bold;letter-spacing:1px}
-.profile{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;font-weight:bold;font-size:17px}
-.profile img{width:100%;height:100%;object-fit:cover}
-.profile svg{width:22px;height:22px;fill:#fff}
-.pmenu{display:none;position:absolute;right:0;top:66px;width:230px;padding:16px;z-index:10;text-align:center;background:rgba(30,30,45,.85)}
-.pmenu.show{display:block}
-.pmenu .av{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:#ff3d81;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;overflow:hidden}
-.pmenu .av img{width:100%;height:100%;object-fit:cover}
-.pmenu .nm{font-weight:bold;font-size:16px;word-break:break-word}
-.pmenu .em{font-size:13px;opacity:.7;margin:4px 0 14px;word-break:break-all}
-.pmenu button{width:100%;padding:10px;border:none;border-radius:10px;background:#ff3d81;color:#fff;font-weight:bold;font-size:15px}
-h2{margin:22px 0 12px;font-size:20px}
-.glass{background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
-a{color:inherit;text-decoration:none}
-#trending{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
-#trending::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100%;scroll-snap-align:start;display:block}
-.slide img{width:100%;height:200px;object-fit:cover;display:block}
-.slide .info{padding:14px 16px;font-size:18px;font-weight:bold}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card img{width:100%;height:130px;object-fit:cover;display:block}
-.card .info{padding:10px 12px;font-size:15px}
-.msg{opacity:.7;font-size:14px}
+body{background:#0b0b12;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+body::before,body::after{content:"";position:fixed;width:260px;height:260px;border-radius:50%;filter:blur(90px);pointer-events:none}
+body::before{background:#ff3d81;top:60px;left:-80px;opacity:.5}
+body::after{background:#5b3dff;bottom:60px;right:-90px;opacity:.5}
+.box{position:relative;z-index:1;width:100%;max-width:380px;padding:26px;background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+h1{text-align:center;font-size:24px;letter-spacing:1px;margin-bottom:4px}
+p.sub{text-align:center;opacity:.7;font-size:14px;margin-bottom:20px}
+input,button{width:100%;padding:12px;margin-bottom:12px;border-radius:10px;font-size:16px}
+input{border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.3);color:#fff}
+input::placeholder{color:rgba(255,255,255,.55)}
+button{border:none;font-weight:bold;color:#fff;background:#ff3d81}
+button.alt{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
+button.google{background:#fff;color:#222}
+.or{text-align:center;opacity:.6;font-size:13px;margin:4px 0 12px}
+#msg{text-align:center;font-size:14px;color:#ffb3c6;min-height:18px}
+a{color:#fff;display:block;text-align:center;font-size:14px;opacity:.7;margin-top:8px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">RHK WISHES</div>
-    <div class="profile" id="profileBtn"></div>
-    <div class="glass pmenu" id="pmenu"></div>
-  </header>
+<div class="box">
+  <h1>RHK WISHES</h1>
+  <p class="sub">Login to continue</p>
 
-  <h2>Trending</h2>
-  <div id="trending" class="glass"><div class="msg" style="padding:16px">Loading...</div></div>
+  <input id="name" type="text" placeholder="Name (only for Sign up)">
+  <input id="email" type="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password (min 6 characters)">
 
-  <h2>Birthday Templates</h2>
-  <div id="list" class="grid"></div>
+  <button id="login">Login</button>
+  <button id="signup" class="alt">Create account</button>
+  <div class="or">or</div>
+  <button id="google" class="google">Continue with Google</button>
+
+  <div id="msg"></div>
+  <a href="index.html">Back to home</a>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
@@ -68,97 +57,52 @@ const firebaseConfig = {
   measurementId: "G-RF4GEDGP9N"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const auth = getAuth(initializeApp(firebaseConfig));
+const $ = id => document.getElementById(id);
+const go = () => { location.href = "index.html"; };
 
-/* ---------- Profile ---------- */
-const btn = document.getElementById("profileBtn");
-const menu = document.getElementById("pmenu");
-const personSvg = '<svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg>';
-let currentUser = null;
+onAuthStateChanged(auth, user => { if(user) go(); });
 
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  if(user){
-    const name = user.displayName || user.email.split("@")[0];
-    const initial = name.charAt(0).toUpperCase();
-    btn.innerHTML = user.photoURL ? `<img src="${user.photoURL}">` : initial;
-    menu.innerHTML = `
-      <div class="av">${user.photoURL ? `<img src="${user.photoURL}">` : initial}</div>
-      <div class="nm">${name}</div>
-      <div class="em">${user.email || ""}</div>
-      <button id="logout">Logout</button>`;
-    document.getElementById("logout").onclick = async () => {
-      await signOut(auth);
-      menu.classList.remove("show");
-    };
-  }else{
-    btn.innerHTML = personSvg;
-    menu.innerHTML = "";
-  }
-});
+function showError(err){
+  const map = {
+    "auth/invalid-credential":"Wrong email or password",
+    "auth/invalid-email":"Invalid email",
+    "auth/email-already-in-use":"Email already registered, use Login",
+    "auth/weak-password":"Password must be at least 6 characters",
+    "auth/popup-closed-by-user":"Google sign-in cancelled",
+    "auth/unauthorized-domain":"Domain not authorized in Firebase",
+    "auth/operation-not-allowed":"This login method is not enabled in Firebase"
+  };
+  $("msg").textContent = map[err.code] || err.message;
+}
 
-btn.onclick = e => {
-  e.stopPropagation();
-  if(!currentUser){ location.href = "login.html"; return; }
-  menu.classList.toggle("show");
+$("login").onclick = async () => {
+  const email = $("email").value.trim(), pass = $("pass").value;
+  if(!email || !pass){ $("msg").textContent = "Enter email and password"; return; }
+  try{
+    $("msg").textContent = "Please wait...";
+    await signInWithEmailAndPassword(auth, email, pass);
+    go();
+  }catch(e){ showError(e); }
 };
-document.addEventListener("click", e => {
-  if(!menu.contains(e.target)) menu.classList.remove("show");
-});
 
-/* ---------- Background ---------- */
-async function loadBackground(){
+$("signup").onclick = async () => {
+  const name = $("name").value.trim(), email = $("email").value.trim(), pass = $("pass").value;
+  if(!email || !pass){ $("msg").textContent = "Enter email and password"; return; }
   try{
-    const s = await getDoc(doc(db,"settings","home"));
-    if(s.exists() && s.data().bgImage){
-      document.body.style.background =
-        `linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url("${s.data().bgImage}") center/cover fixed no-repeat`;
-    }
-  }catch(e){}
-}
+    $("msg").textContent = "Please wait...";
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    if(name) await updateProfile(cred.user, { displayName: name });
+    go();
+  }catch(e){ showError(e); }
+};
 
-/* ---------- Templates ---------- */
-async function loadTemplates(){
-  const t = document.getElementById("trending");
-  const l = document.getElementById("list");
+$("google").onclick = async () => {
   try{
-    const snap = await getDocs(query(collection(db,"templates"), orderBy("n","desc")));
-    const items = snap.docs.map(d => d.data());
-    if(!items.length){
-      t.innerHTML = '<div class="msg" style="padding:16px">No templates yet</div>';
-      return;
-    }
-
-    const latest = items.slice(0,4);
-    t.innerHTML = latest.map(i => `
-      <a class="slide" href="birthday${i.n}.html">
-        <img src="${i.image}"><div class="info">${i.name}</div>
-      </a>`).join("");
-
-    if(latest.length > 1){
-      let idx = 0;
-      t.addEventListener("scroll", () => {
-        idx = Math.round(t.scrollLeft / t.clientWidth);
-      });
-      setInterval(() => {
-        idx = (idx + 1) % latest.length;
-        t.scrollTo({left: idx * t.clientWidth, behavior:"smooth"});
-      }, 2000);
-    }
-
-    l.innerHTML = items.map(i => `
-      <a class="glass card" href="birthday${i.n}.html">
-        <img src="${i.image}"><div class="info">${i.name}</div>
-      </a>`).join("");
-  }catch(e){
-    t.innerHTML = '<div class="msg" style="padding:16px">Could not load templates</div>';
-  }
-}
-
-loadBackground();
-loadTemplates();
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    go();
+  }catch(e){ showError(e); }
+};
 </script>
 </body>
 </html>
