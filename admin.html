@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0b0b12;color:#fff;padding:20px}
+h2{margin-bottom:16px}
+input,button{width:100%;padding:12px;margin-bottom:12px;border-radius:10px;border:1px solid #444;background:#1a1a26;color:#fff;font-size:16px}
+button{background:#ff3d81;border:none;font-weight:bold}
+img{max-width:100%;border-radius:12px;margin-bottom:12px}
+#status{opacity:.8}
+</style>
+</head>
+<body>
+<h2>Add Template</h2>
+<input id="n" type="number" placeholder="Template number (1 = birthday1.html)">
+<input id="name" type="text" placeholder="Template name">
+<input id="file" type="file" accept="image/*">
+<img id="preview" style="display:none">
+<button id="save">Save</button>
+<div id="status"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
+  authDomain: "rhk-music-24bbc.firebaseapp.com",
+  databaseURL: "https://rhk-music-24bbc-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "rhk-music-24bbc",
+  storageBucket: "rhk-music-24bbc.firebasestorage.app",
+  messagingSenderId: "571438674805",
+  appId: "1:571438674805:web:bcfe7856316b638d08193c",
+  measurementId: "G-RF4GEDGP9N"
+};
+const CLOUD_NAME = "nhy9lfkt";
+const UPLOAD_PRESET = "rhk_upload";
+
+const db = getFirestore(initializeApp(firebaseConfig));
+const $ = id => document.getElementById(id);
+
+$("file").onchange = e => {
+  const f = e.target.files[0];
+  if(f){ $("preview").src = URL.createObjectURL(f); $("preview").style.display = "block"; }
+};
+
+$("save").onclick = async () => {
+  const n = parseInt($("n").value);
+  const name = $("name").value.trim();
+  const file = $("file").files[0];
+  if(!n || !name || !file){ $("status").textContent = "Fill all fields"; return; }
+
+  try{
+    $("status").textContent = "Uploading image...";
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("upload_preset", UPLOAD_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:fd});
+    const data = await res.json();
+    if(!data.secure_url) throw new Error("Upload failed");
+
+    $("status").textContent = "Saving...";
+    await setDoc(doc(db,"templates","birthday"+n), {
+      n, name, image: data.secure_url, createdAt: serverTimestamp()
+    });
+    $("status").textContent = "Saved! birthday" + n + ".html added to home.";
+  }catch(err){
+    $("status").textContent = "Error: " + err.message;
+  }
+};
+</script>
+</body>
+</html>
