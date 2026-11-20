@@ -7,9 +7,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#0b0b12;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
-body::before,body::after{content:"";position:fixed;width:260px;height:260px;border-radius:50%;filter:blur(90px);z-index:0}
-body::before{background:#ff3d81;top:80px;left:-80px;opacity:.5}
-body::after{background:#5b3dff;top:360px;right:-90px;opacity:.5}
+body::before,body::after{content:"";position:fixed;width:260px;height:260px;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none}
+body::before{background:#ff3d81;top:80px;left:-80px;opacity:.4}
+body::after{background:#5b3dff;top:360px;right:-90px;opacity:.4}
 .wrap{position:relative;z-index:1;padding:0 18px 40px}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25)}
 .brand{font-size:22px;font-weight:bold;letter-spacing:1px}
@@ -18,8 +18,11 @@ header{display:flex;justify-content:space-between;align-items:center;padding:18p
 h2{margin:22px 0 12px;font-size:20px}
 .glass{background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.25);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
 a{color:inherit;text-decoration:none}
-.trend img{width:100%;height:190px;object-fit:cover;display:block}
-.trend .info{padding:14px 16px;font-size:18px;font-weight:bold}
+#trending{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;position:relative;scrollbar-width:none}
+#trending::-webkit-scrollbar{display:none}
+#trending .glass{flex:0 0 78%;scroll-snap-align:start}
+#trending img{width:100%;height:180px;object-fit:cover;display:block}
+#trending .info{padding:12px 14px;font-size:17px;font-weight:bold}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .card img{width:100%;height:130px;object-fit:cover;display:block}
 .card .info{padding:10px 12px;font-size:15px}
@@ -34,7 +37,7 @@ a{color:inherit;text-decoration:none}
   </header>
 
   <h2>Trending</h2>
-  <div id="trending" class="msg">Loading...</div>
+  <div id="trending"><div class="msg">Loading...</div></div>
 
   <h2>Birthday Templates</h2>
   <div id="list" class="grid"></div>
@@ -42,7 +45,7 @@ a{color:inherit;text-decoration:none}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBND3n2ag9qGZG5SJPOKNVYr2dHNLwoD7Y",
@@ -57,27 +60,50 @@ const firebaseConfig = {
 
 const db = getFirestore(initializeApp(firebaseConfig));
 
-async function load(){
+async function loadBackground(){
+  try{
+    const s = await getDoc(doc(db,"settings","home"));
+    if(s.exists() && s.data().bgImage){
+      document.body.style.background =
+        `linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url("${s.data().bgImage}") center/cover fixed no-repeat`;
+    }
+  }catch(e){}
+}
+
+async function loadTemplates(){
   const t = document.getElementById("trending");
   const l = document.getElementById("list");
   try{
     const snap = await getDocs(query(collection(db,"templates"), orderBy("n","desc")));
     const items = snap.docs.map(d => d.data());
-    if(!items.length){ t.textContent = "No templates yet"; return; }
+    if(!items.length){ t.innerHTML = '<div class="msg">No templates yet</div>'; return; }
 
-    const top = items[0];
-    t.className = "glass trend";
-    t.innerHTML = `<a href="birthday${top.n}.html"><img src="${top.image}"><div class="info">${top.name}</div></a>`;
+    const latest = items.slice(0,4);
+    t.innerHTML = latest.map(i => `
+      <a class="glass" href="birthday${i.n}.html">
+        <img src="${i.image}"><div class="info">${i.name}</div>
+      </a>`).join("");
+
+    if(latest.length > 1){
+      let idx = 0;
+      setInterval(() => {
+        idx = (idx + 1) % latest.length;
+        const first = t.children[0].offsetLeft;
+        t.scrollTo({left: t.children[idx].offsetLeft - first, behavior:"smooth"});
+      }, 2000);
+    }
 
     l.innerHTML = items.map(i => `
       <a class="glass card" href="birthday${i.n}.html">
         <img src="${i.image}"><div class="info">${i.name}</div>
       </a>`).join("");
   }catch(e){
-    t.textContent = "Could not load templates";
+    t.innerHTML = '<div class="msg">Could not load templates</div>';
   }
 }
-load();
+
+loadBackground();
+loadTemplates();
 </script>
 </body>
 </html>
