@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RHK WISHES</title>
+<title>RHK WISHES - Birthday Wish Templates</title>
+<meta name="description" content="RHK WISHES: create beautiful birthday wish pages and send them to your loved ones. Free birthday templates.">
+<meta name="google-site-verification" content="0vnZFZ154D1f55L_hxSQ496_-ElRPEg7fwjvXndFCXY" />
+<link rel="canonical" href="https://instagrammeta9292-bot.github.io/RHK-WISHES-/">
+<meta property="og:title" content="RHK WISHES">
+<meta property="og:description" content="Create beautiful birthday wish pages for your loved ones.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://instagrammeta9292-bot.github.io/RHK-WISHES-/">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#0b0b12;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
@@ -12,7 +20,8 @@ body::before{background:#ff3d81;top:80px;left:-80px;opacity:.4}
 body::after{background:#5b3dff;top:360px;right:-90px;opacity:.4}
 .wrap{position:relative;z-index:1;padding:0 18px 40px}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 14px;border-bottom:1px solid rgba(255,255,255,.25);position:relative}
-.brand{font-size:22px;font-weight:bold;letter-spacing:1px}
+.brand{font-size:22px;font-weight:bold;letter-spacing:1px;margin:0}
+.tag{margin-top:14px;font-size:14px;opacity:.75;line-height:1.5}
 .profile{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;font-weight:bold;font-size:17px}
 .profile img{width:100%;height:100%;object-fit:cover}
 .profile svg{width:22px;height:22px;fill:#fff}
@@ -40,10 +49,12 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">RHK WISHES</div>
+    <h1 class="brand">RHK WISHES</h1>
     <div class="profile" id="profileBtn"></div>
     <div class="glass pmenu" id="pmenu"></div>
   </header>
+
+  <p class="tag">Create beautiful birthday wish pages for your loved ones. Choose a birthday template, add your photos and message, and send your wish.</p>
 
   <h2>Trending</h2>
   <div id="trending" class="glass"><div class="msg" style="padding:16px">Loading...</div></div>
@@ -134,7 +145,7 @@ async function loadTemplates(){
     const latest = items.slice(0,4);
     t.innerHTML = latest.map(i => `
       <a class="slide" href="birthday${i.n}.html">
-        <img src="${i.image}"><div class="info">${i.name}</div>
+        <img src="${i.image}" alt="${i.name}"><div class="info">${i.name}</div>
       </a>`).join("");
 
     if(latest.length > 1){
@@ -150,7 +161,7 @@ async function loadTemplates(){
 
     l.innerHTML = items.map(i => `
       <a class="glass card" href="birthday${i.n}.html">
-        <img src="${i.image}"><div class="info">${i.name}</div>
+        <img src="${i.image}" alt="${i.name}"><div class="info">${i.name}</div>
       </a>`).join("");
   }catch(e){
     t.innerHTML = '<div class="msg" style="padding:16px">Could not load templates</div>';
